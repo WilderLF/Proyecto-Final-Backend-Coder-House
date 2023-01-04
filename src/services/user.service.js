@@ -15,7 +15,27 @@ class UserService {
 
   async getUserById(user_id) {
     try {
-      return await UserDAO.getUserById(user_id);
+      return await UserDAO.getById(user_id);
+    } catch (err) {
+      throw new Error(err?.message);
+    }
+  }
+
+  async addMessageToUserById(user_id, message) {
+    try {
+      return await UserDAO.addMessageToUserById(user_id, message);
+    } catch (err) {
+      throw new Error(err?.message);
+    }
+  }
+
+  async addReplyToMessageToUserById(message_id, newReply, user_id) {
+    try {
+      return await UserDAO.addReplyToMessageToUserById(
+        message_id,
+        newReply,
+        user_id
+      );
     } catch (err) {
       throw new Error(err?.message);
     }
@@ -32,7 +52,11 @@ class UserService {
 
       if (!user) {
         const hashedPassword = await bcrypt.hash(password, 8); // Encrypting the password
-        const userCart = await CartService.createCart([]); // Create a cart for this user
+        const userCart = await CartService.createCart({
+          email: email,
+          products: [],
+          delivery_address: address,
+        }); // Create a cart for this user
         const newUser = {
           username,
           email,
@@ -42,6 +66,7 @@ class UserService {
           phone,
           password: hashedPassword,
           cart_id: userCart._id,
+          messages: [],
         };
         return await UserDAO.create(newUser);
       }
@@ -49,6 +74,22 @@ class UserService {
       throw new Error(err?.message);
     }
   }
+
+  async updateUserMessagesById(user_id, messages) {
+    try {
+      return await UserDAO.updateUserMessagesById(user_id, messages);
+    } catch (err) {
+      throw new Error(err?.message);
+    }
+  }
+
+  /* async deleteMessageFromUserById(message_id, user_id) {
+    try {
+      return await UserDAO.deleteMessageFromUserById(message_id, user_id);
+    } catch (err) {
+      throw new Error(err?.message);
+    }
+  } */
 }
 
 export default new UserService();
